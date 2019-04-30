@@ -1,48 +1,65 @@
 #include <Arduino.h>
-#define FLOW1 2
-#define FLOW2 3
+#define FLOW_IN 3
+#define FLOW_OUT 2
 
-volatile int pulseCount1 = 0;
-volatile int pulseCount2 = 0;
+volatile int pulseCountIn = 0;
+volatile int pulseCountOut = 0;
 
-float volume1 = 0;
-float volume2 = 0;
+float volumeIn = 0; // Volume du réservoir à l'auge
+float volumeOut = 0; // Volume Retiré de l'auge après utilisation
 
-const float calibrationFactor = 5.5;
+const float PROGMEM calibrationFactor = 5.5;
 
-void pulseFlow1(){
-  pulseCount1++;
-  digitalWrite(LED_BUILTIN, pulseCount1  % 2);
+void pulseFlowIn(){
+  pulseCountIn++;
 }
 
-void pulseFlow2(){
-  pulseCount2++;
+void pulseFlowOut(){
+  pulseCountOut++;
 }
 
-void resetFlow(){
-  attachInterrupt(digitalPinToInterrupt(FLOW1), pulseFlow1, FALLING);
-  attachInterrupt(digitalPinToInterrupt(FLOW2), pulseFlow2, FALLING);
-  volume1 = 0;
-  volume2 = 0;
-  pulseCount1 = 0;
-  pulseCount2 = 0;
+void startFlow(){
+  attachInterrupt(digitalPinToInterrupt(FLOW_IN), pulseFlowIn, FALLING);
+  attachInterrupt(digitalPinToInterrupt(FLOW_OUT), pulseFlowOut, FALLING);
 }
 
 void stopFlow(){
-  detachInterrupt(FLOW1);
-  detachInterrupt(FLOW2);
+  detachInterrupt(FLOW_IN);
+  detachInterrupt(FLOW_OUT);
+}
+
+void resetFlow(){
+  startFlow();
+  volumeIn = 0;
+  volumeOut = 0;
+  pulseCountIn = 0;
+  pulseCountOut = 0;
 }
 
 void setupFlow(){
-  pinMode(FLOW1, INPUT_PULLUP);
-  pinMode(FLOW2, INPUT_PULLUP);
+  pinMode(FLOW_IN, INPUT_PULLUP);
+  pinMode(FLOW_OUT, INPUT_PULLUP);
   
   resetFlow();
 }
 
 int getPulse(uint8_t port){
   if(port == 0){
-    return pulseCount1;
+    return pulseCountIn;
   }
-  return pulseCount2;
+  return pulseCountOut;
+}
+
+float getVolumeIn(){
+  stopFlow();
+  float v = pulseCountIn * calibrationFactor;
+  startFlow();
+  return v;
+}
+
+float getVolumeOut(){
+  stopFlow();
+  float v = pulseCountOut * calibrationFactor;
+  startFlow();
+  return v;
 }
