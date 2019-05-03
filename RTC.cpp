@@ -1,6 +1,6 @@
 #include <TimeLib.h>
 #include <Wire.h>
-#include <DS1307RTC.h>  // a basic DS1307 library that returns time as a time_t
+#include <DS1307RTC.h>
 
 tmElements_t tm;
 
@@ -47,7 +47,7 @@ void setupRTC(){
   }
 }
 
-String padInt(uint8_t t){
+String padInt(const uint8_t& t){
   return (t < 10 ? "0" : "") + String(t);
 }
 
@@ -57,7 +57,9 @@ String getDatetime(){
   ret += "/";
   ret += padInt(month());
   ret += "/";
-  ret += year();
+
+  ret += String(year()).substring(2);
+
   ret += " ";
   ret += padInt(hour());
   ret += ":";
@@ -66,5 +68,4 @@ String getDatetime(){
   ret += padInt(second());
 
   return ret;
-    
 }

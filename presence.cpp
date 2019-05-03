@@ -26,5 +26,12 @@ float distanceMm(){
 }
 
 bool presenceDetected(){
-  return distanceMm() / 10 <= PRESENCE_THRESHOLD;
+  uint8_t tries = 10;
+  while(tries--){
+    if (distanceMm() / 10 > PRESENCE_THRESHOLD){
+      return false;
+    }
+    delay(100);
+  }
+  return true;
 }

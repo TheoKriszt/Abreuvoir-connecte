@@ -60,6 +60,12 @@ void showPurgeScreen(const float& litersIn, const float& litersOut){
   
 }
 
+void showNoSDScreen(){
+  u8x8.setCursor(0,0);
+  u8x8.print(F("ERREUR CARTE SD"));
+  
+}
+
 void clearScreen(){
   u8x8.clear();
 }

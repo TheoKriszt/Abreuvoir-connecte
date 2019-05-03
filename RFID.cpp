@@ -10,17 +10,33 @@ void setupRFIDReader() {
 
 String readRFID() {
   char c;
-  if (altser.available()) {
-    c = altser.read();
+  //bool complete = false;
 
-    if (c && c != '\r') {
+  while(altser.available()){
+    c = altser.read();
+    if(c && c != '\r' ){
       line.concat(c);
-    } else if (c == '\r') {
+    }else if (c == '\r'){
+      //complete = true;
+      
       String ret = line;
       line = "";
       return ret;
     }
   }
+  /*
+  if (altser.available()) {
+    c = altser.read();
 
+    if (c && c != '\r') {
+      line.concat(c);
+      Serial.println(c);
+    } else if (c == '\r') {
+      String ret = line;
+      line = "";
+      return ret;
+    }
+  }/**/
+  
   return "";
 }

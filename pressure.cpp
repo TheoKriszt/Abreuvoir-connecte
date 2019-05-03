@@ -17,9 +17,8 @@ float getPressureKPa(){
   }
   voltage /= SAMPLES;
  voltage *= (5.00 / 1024);
-  Serial.print(F("Voltage : "));
-  Serial.println(voltage, 4);
-  
+  //Serial.print(F("Voltage : "));
+  //Serial.println(voltage, 4);
   return (voltage - offset) * 400;
 }
 

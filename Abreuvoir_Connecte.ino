@@ -43,10 +43,15 @@ void setup() {
   pinMode(4 , OUTPUT);
   
 
-  setupSD();
+  bool sdOK = setupSD();
   setupOLED();
-  Serial.print("Datetime : ");
-  Serial.println(getDatetime());
+  
+  if(!sdOK){
+    clearScreen();
+    showNoSDScreen();
+    while(1);
+  }
+
 }
 
 
@@ -67,6 +72,10 @@ void loop() {
 
 void goMonitor() {
 
+  if(tag == ""){
+    tag = readRFID();
+  }
+  /*
   bool gone = false;
   uint8_t tries = 10;
   while (!presenceDetected()) {
@@ -76,8 +85,8 @@ void goMonitor() {
       break;
     }
   }
-
-  if (gone) {
+  */
+  if (!presenceDetected()) {
     etat = PURGE;
     digitalWrite(PUMP, HIGH);
     digitalWrite(VALVE_OUT, HIGH);
@@ -88,7 +97,7 @@ void goMonitor() {
   }
 
   showRecordingScreen(tag, getVolumeIn());
-  Serial.println(getVolumeIn());
+  //Serial.println(getVolumeIn());
 }
 
 
@@ -99,14 +108,18 @@ void goPurge() {
 
   if(oldOutputVolume != getVolumeOut() ) {
       purgeStart = millis();
+  digitalWrite(PUMP, HIGH);
+  digitalWrite(VALVE_OUT, HIGH);
       oldOutputVolume = getVolumeOut();
   }
   
   if (millis() > purgeStart + PURGE_TIME){
     
     etat = REPOS;
+    
+    float volume = getVolumeIn() - getVolumeOut();
+    saveRow(tag, volume);
     resetFlow();
-    saveRow(tag, getVolumeIn() - getVolumeOut());
     tag = "";
     delay(100);
     clearScreen();
@@ -125,14 +138,12 @@ void goIdle() {
   }
 
   String dt = getDatetime();
-  dt = dt.substring(0, 5) + " " + dt.substring(11);
-  showIdleSreen(
-    getPressureKPa(), 
-    dt
-    );
+  dt = dt.substring(0, 5) + " " + dt.substring(9);
+  showIdleSreen( getPressureKPa(), dt );
 }
 
-void saveRow(String tag, float volume) {
+void saveRow(const String& tag, float volume) {
+  //Serial.println("Saving " + String(volume));
   
   logLine(  getDatetime() + ";" + (tag == "" ? F("INCONNU") : tag) + ";" + String(volume, 4)  );
 }
