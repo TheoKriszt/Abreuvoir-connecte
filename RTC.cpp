@@ -57,7 +57,7 @@ String getDatetime(){
   ret += "/";
   ret += padInt(month());
   ret += "/";
-  ret += year();
+  ret += String(year()).substring(2);
   ret += " ";
   ret += padInt(hour());
   ret += ":";

@@ -12,11 +12,12 @@ File logFile;
 
 
 bool logLine(const String& line){
-
   logFile = SD.open(FILENAME, FILE_WRITE);
+  //Serial.print("Saving");
+  //Serial.println(line);
   if (logFile) {                     // if the file is available, write to it:
-    logFile.println(HEADER);
-    logFile.close();
+    logFile.println(line);
+    logFile.close();  
     return true;
   } else {
     SD.errorPrint();
@@ -25,16 +26,17 @@ bool logLine(const String& line){
   }
 }
 
-void setupSD(){
+bool setupSD(){
 
   if (!SD.begin(CS, SD_SCK_MHZ(SD_FREQ))) {
     SD.errorPrint();
-    Serial.println(F("SD inaccessible"));
+    //Serial.println(F("SD inaccessible"));
+    return false;
   }else {
     Serial.println(F("SD OK"));
-
     if(!SD.exists(FILENAME)){
       logLine(HEADER); 
     }
+    return true;
   }
 }

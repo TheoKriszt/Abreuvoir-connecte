@@ -43,10 +43,13 @@ void setup() {
   pinMode(4 , OUTPUT);
   
 
-  setupSD();
+  bool sdOK = setupSD();
   setupOLED();
-  Serial.print("Datetime : ");
-  Serial.println(getDatetime());
+  if(!sdOK){
+    clearScreen();
+    showNoSDScreen();
+    while(1);
+  }
 }
 
 
@@ -104,8 +107,10 @@ void goPurge() {
   if (millis() > purgeStart + PURGE_TIME){
     
     etat = REPOS;
+    
+    float volume = getVolumeIn() - getVolumeOut();
+    saveRow(tag, volume);
     resetFlow();
-    saveRow(tag, getVolumeIn() - getVolumeOut());
     tag = "";
     delay(100);
     clearScreen();
@@ -124,14 +129,13 @@ void goIdle() {
   }
 
   String dt = getDatetime();
-  dt = dt.substring(0, 5) + " " + dt.substring(11);
+  dt = dt.substring(0, 5) + " " + dt.substring(9);
   showIdleSreen(
-    getPressureKPa(), 
-    dt
-    );
+    getPressureKPa(), dt);
 }
 
-void saveRow(String tag, float volume) {
+void saveRow(const String& tag, float volume) {
+  Serial.println("Saving " + String(volume));
   
   logLine(  getDatetime() + ";" + (tag == "" ? F("INCONNU") : tag) + ";" + String(volume, 4)  );
 }
