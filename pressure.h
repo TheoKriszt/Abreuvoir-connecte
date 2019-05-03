@@ -1,6 +1,7 @@
 #ifndef H__PRESSURE
 #define H__PRESSURE
   void setupPressure();
-  float getPressureKpa();
+  float getPressureKPa();
+  float getPressureMeters();
   
 #endif

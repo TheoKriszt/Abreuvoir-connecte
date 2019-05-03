@@ -1,6 +1,6 @@
 #include <Arduino.h>
-#define FLOW_IN 3
-#define FLOW_OUT 2
+#define FLOW_IN 2
+#define FLOW_OUT 3
 
 volatile int pulseCountIn = 0;
 volatile int pulseCountOut = 0;

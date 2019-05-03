@@ -13,16 +13,18 @@ void setupOLED(){
   u8x8.clear();
 }
 
-void showIdleSreen(const float& pressure){
+void showIdleSreen(const float& pressure, const String& datetime){
   
   u8x8.inverse();
   u8x8.setCursor(0,0);
   u8x8.print(F("   En attente   "));
   u8x8.noInverse();
   u8x8.setCursor(0,2);
-  
+  u8x8.println(datetime);
+  u8x8.setCursor(0,4);
   u8x8.println(F("Pression : "));
-  u8x8.println(String(pressure, 3) + " kPa");
+  u8x8.print(String(pressure, 3));
+  u8x8.println(F(" KPa"));
   
 }
 
@@ -37,7 +39,8 @@ void showRecordingScreen(const String& tag, const float& litersIn){
   u8x8.print(F("Tag : "));
   u8x8.println(tag == "" ? F("INCONNU") : tag);
   u8x8.print(F("IN : "));
-  u8x8.println(String(litersIn, 3) + "L");
+  u8x8.print(litersIn);
+  u8x8.println(F("mL"));
 }
 
 void showPurgeScreen(const float& litersIn, const float& litersOut){
@@ -48,12 +51,12 @@ void showPurgeScreen(const float& litersIn, const float& litersOut){
   u8x8.noInverse();
   u8x8.setCursor(0,3);
 
-  u8x8.print(F("IN : "));
+  u8x8.print(F(" IN : "));
   u8x8.print(String(litersIn, 3));
-  u8x8.println(F("L"));
+  u8x8.println(F(" mL"));
   u8x8.print(F("OUT : "));
-  u8x8.println(String(litersOut, 3));
-  u8x8.println(F("L"));
+  u8x8.print(String(litersOut, 3));
+  u8x8.println(F(" mL"));
   
 }
 

@@ -10,87 +10,79 @@
 #define PUMP 5
 #define VALVE_IN 6
 
-enum Etat
-  {
-    REPOS,
-    SUIVI,
-    PURGE
-  };
+#define PURGE_TIME 2000
+
+enum Etat {
+  REPOS,
+  SUIVI,
+  PURGE
+};
 typedef enum Etat Etat_t ;
 
 Etat_t etat = REPOS;
+
 String tag = "";
 
 float oldOutputVolume = 0; // suivi du volume d'eau sortant
+unsigned long purgeStart = millis();
 
 void setup() {
+  Serial.begin(9600);
 
   pinMode(VALVE_OUT, OUTPUT);
   pinMode(VALVE_IN, OUTPUT);
   pinMode(PUMP, OUTPUT);
-  
+
   setupPresenceSensor();
   setupFlow();
   setupRFIDReader();
   setupRTC();
   setupPressure();
-  
-  Serial.begin(9600);
 
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(4 , OUTPUT);
-  Serial.println("Datetime : " + getDatetime());
+  
 
   setupSD();
   setupOLED();
+  Serial.print("Datetime : ");
+  Serial.println(getDatetime());
 }
 
 
 void loop() {
-  // put your main code here, to run repeatedly:
-//  Serial.println(distanceMm());
-//  digitalWrite(LED_BUILTIN, presenceDetected());
-//  digitalWrite(4, presenceDetected());
-  
-//  String id = readRFID();
-//  if(id != ""){
-//    Serial.println(id);  
-//  }
-  
-//  Serial.println(getPulse(0) + ";" + getPulse(1));
-//  Serial.println(getPressureKpa());
-
-//  showPurgeScreen(0.425, 0.3333);
-
-  switch (etat){
+  switch (etat) {
     case SUIVI:
       goMonitor();
-    break;
+      break;
     case PURGE:
       goPurge();
-    break;
+      break;
     case REPOS:
     default:
-    goIdle();
+      goIdle();
   }
 
 }
 
-void goMonitor(){
+void goMonitor() {
 
   bool gone = false;
   uint8_t tries = 10;
-  while(!presenceDetected()){
+  while (!presenceDetected()) {
     delay(100);
-    if(!tries--){
+    if (!tries--) {
       gone = true;
       break;
     }
   }
-  
-  if(gone){
+
+  if (gone) {
     etat = PURGE;
+    digitalWrite(PUMP, HIGH);
+    digitalWrite(VALVE_OUT, HIGH);
     oldOutputVolume = 0;
+    purgeStart = millis();
     clearScreen();
     return;
   }
@@ -100,32 +92,47 @@ void goMonitor(){
 }
 
 
-void goPurge(){
-  if(oldOutputVolume == getVolumeOut()){
+void goPurge() {
+
+  showPurgeScreen(getVolumeIn(), getVolumeOut());
+  
+
+  if(oldOutputVolume != getVolumeOut() ) {
+      purgeStart = millis();
+      oldOutputVolume = getVolumeOut();
+  }
+  
+  if (millis() > purgeStart + PURGE_TIME){
+    
     etat = REPOS;
     resetFlow();
     saveRow(tag, getVolumeIn() - getVolumeOut());
     tag = "";
+    delay(100);
     clearScreen();
+    digitalWrite(PUMP, LOW);
+    digitalWrite(VALVE_OUT, LOW);
+    
   }
+    
 }
 
-void goIdle(){
-  if(presenceDetected()){
+void goIdle() {
+  if (presenceDetected()) {
     etat = SUIVI;
     clearScreen();
     return;
   }
-  showIdleSreen(getPressureKpa());
+
+  String dt = getDatetime();
+  dt = dt.substring(0, 5) + " " + dt.substring(11);
+  showIdleSreen(
+    getPressureKPa(), 
+    dt
+    );
 }
 
-void saveRow(String tag, float volume){
-  if(tag == ""){
-    tag = F("INCONNU");
-  }
-  Serial.print(F("Saving "));
-  Serial.print(getDatetime() + ";");
-  Serial.print(tag + ";");
-  Serial.println(volume);
-  logLine(  getDatetime() + ";" + tag + ";" + String(volume, 4)  );
+void saveRow(String tag, float volume) {
+  
+  logLine(  getDatetime() + ";" + (tag == "" ? F("INCONNU") : tag) + ";" + String(volume, 4)  );
 }
