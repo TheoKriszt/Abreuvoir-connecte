@@ -9,8 +9,7 @@ const char * const monthName[12] PROGMEM = {
   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 };
 
-bool getTime(const char *str)
-{
+bool getTime(const char *str){
   int Hour, Min, Sec;
 
   if (sscanf(str, "%d:%d:%d", &Hour, &Min, &Sec) != 3) return false;
@@ -20,8 +19,7 @@ bool getTime(const char *str)
   return true;
 }
 
-bool getDate(const char *str)
-{
+bool getDate(const char *str){
 
   char Month[12];
   int Day, Year;
@@ -54,5 +52,19 @@ String padInt(uint8_t t){
 }
 
 String getDatetime(){
-  return String(padInt(day())+ "/" + padInt(month()) + "/" + padInt(year()) + " " + padInt(hour()) + ":" + padInt(minute()) + ":" + padInt(second()));
+  String ret = "";
+  ret += padInt(day());
+  ret += "/";
+  ret += padInt(month());
+  ret += "/";
+  ret += year();
+  ret += " ";
+  ret += padInt(hour());
+  ret += ":";
+  ret += padInt(minute());
+  ret += ":";
+  ret += padInt(second());
+
+  return ret;
+    
 }
