@@ -9,7 +9,11 @@ U8X8_SH1106_128X64_NONAME_HW_I2C u8x8(U8X8_PIN_NONE);
 
 void setupOLED(){
   u8x8.begin();
-  u8x8.setFont(u8x8_font_amstrad_cpc_extended_f);    
+  //u8x8.setFont(u8x8_font_amstrad_cpc_extended_f);   // 30058 octets (97%)
+  u8x8.setFont(u8x8_font_amstrad_cpc_extended_r); // 29026 octets (92%) libres
+  
+  
+  
   u8x8.clear();
 }
 
@@ -41,6 +45,13 @@ void showRecordingScreen(const String& tag, const float& litersIn){
   u8x8.print(F("IN : "));
   u8x8.print(litersIn);
   u8x8.println(F("mL"));
+}
+
+void showPulsesIn(const int& pulsesIn){
+  u8x8.setCursor(0,4);
+  u8x8.println(F("pulses"));
+  u8x8.print(pulsesIn);
+  
 }
 
 void showPurgeScreen(const float& litersIn, const float& litersOut){

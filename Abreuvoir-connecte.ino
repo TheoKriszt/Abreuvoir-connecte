@@ -12,6 +12,8 @@
 
 #define PURGE_TIME 2000
 
+
+
 enum Etat {
   REPOS,
   SUIVI,
@@ -49,7 +51,7 @@ void setup() {
   if(!sdOK){
     clearScreen();
     showNoSDScreen();
-    while(1);
+    //while(1);
   }
 
 }
@@ -97,6 +99,7 @@ void goMonitor() {
   }
 
   showRecordingScreen(tag, getVolumeIn());
+  showPulsesIn(getPulseCountIn());
   //Serial.println(getVolumeIn());
 }
 
@@ -104,7 +107,6 @@ void goMonitor() {
 void goPurge() {
 
   showPurgeScreen(getVolumeIn(), getVolumeOut());
-  
 
   if(oldOutputVolume != getVolumeOut() ) {
       purgeStart = millis();

@@ -8,7 +8,9 @@ volatile int pulseCountOut = 0;
 float volumeIn = 0; // Volume du réservoir à l'auge
 float volumeOut = 0; // Volume Retiré de l'auge après utilisation
 
-const float PROGMEM calibrationFactor = 5.5;
+//const float PROGMEM mililiterPerPulse = 5.5;
+
+const float PROGMEM mililiterPerPulse = 3.8;
 
 void pulseFlowIn(){
   pulseCountIn++;
@@ -52,14 +54,18 @@ int getPulse(uint8_t port){
 
 float getVolumeIn(){
   stopFlow();
-  float v = pulseCountIn * calibrationFactor;
+  float v = pulseCountIn * mililiterPerPulse;
   startFlow();
   return v;
 }
 
+int getPulseCountIn(){
+  return pulseCountIn;
+}
+
 float getVolumeOut(){
   stopFlow();
-  float v = pulseCountOut * calibrationFactor;
+  float v = pulseCountOut * mililiterPerPulse;
   startFlow();
   return v;
 }
