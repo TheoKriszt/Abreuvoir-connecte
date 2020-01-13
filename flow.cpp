@@ -10,7 +10,10 @@ float volumeOut = 0; // Volume Retiré de l'auge après utilisation
 
 //const float PROGMEM mililiterPerPulse = 5.5;
 
-const float PROGMEM mililiterPerPulse = 3.8;
+//const float PROGMEM mililiterPerPulse = 3.8;
+
+const float PROGMEM calibrationFactorIn = 2.642 * (483.49/404.23); // OK sous pression 0.7 Bar
+const float PROGMEM calibrationFactorOut = 2.642; // OK descente gravitaire
 
 void pulseFlowIn(){
   pulseCountIn++;
@@ -20,18 +23,18 @@ void pulseFlowOut(){
   pulseCountOut++;
 }
 
-void startFlow(){
+void startMonitoring(){
   attachInterrupt(digitalPinToInterrupt(FLOW_IN), pulseFlowIn, FALLING);
   attachInterrupt(digitalPinToInterrupt(FLOW_OUT), pulseFlowOut, FALLING);
 }
 
-void stopFlow(){
+void stopMonitoring(){
   detachInterrupt(FLOW_IN);
   detachInterrupt(FLOW_OUT);
 }
 
 void resetFlow(){
-  startFlow();
+  startMonitoring();
   volumeIn = 0;
   volumeOut = 0;
   pulseCountIn = 0;
@@ -53,9 +56,9 @@ int getPulse(uint8_t port){
 }
 
 float getVolumeIn(){
-  stopFlow();
-  float v = pulseCountIn * mililiterPerPulse;
-  startFlow();
+  stopMonitoring();
+  float v = pulseCountIn * calibrationFactorIn;
+  startMonitoring();
   return v;
 }
 
@@ -64,8 +67,8 @@ int getPulseCountIn(){
 }
 
 float getVolumeOut(){
-  stopFlow();
-  float v = pulseCountOut * mililiterPerPulse;
-  startFlow();
+  stopMonitoring();
+  float v = pulseCountOut * calibrationFactorOut;
+  startMonitoring();
   return v;
 }

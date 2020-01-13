@@ -1,8 +1,9 @@
 #include <Arduino.h>
 
 #define PRESSURE_ANALOG A3
-#define SAMPLES 100
-static const float PROGMEM offset = 0.495;
+#define SAMPLES 10
+#define VREF 4.944
+#define OFFSET 0.495 
 
 void setupPressure(){
  pinMode(PRESSURE_ANALOG, INPUT); 
@@ -10,16 +11,25 @@ void setupPressure(){
 
 float getPressureKPa(){
   
-  float voltage = 0;
+  unsigned int voltage = 0;
   for(int i = 0; i < SAMPLES; i++){
     voltage += analogRead(PRESSURE_ANALOG)  ;
-    delay(5);
   }
-  voltage /= SAMPLES;
- voltage *= (5.00 / 1024);
-  //Serial.print(F("Voltage : "));
-  //Serial.println(voltage, 4);
-  return (voltage - offset) * 400;
+  
+  float pressure =  (voltage / SAMPLES + 0.5) * VREF / 1024.0  ;
+  pressure = (pressure - OFFSET) * 400;
+  //pressure = (pressure - offset) * 400;
+  
+  
+  if(pressure < 0 && pressure > -1) {
+    pressure = 0;
+  }
+  
+  return pressure;
+}
+
+float getPressureBar(){
+  return getPressureKPa() / 100;
 }
 
 float getPressureMeters(){

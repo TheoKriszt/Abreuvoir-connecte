@@ -5,22 +5,27 @@
 SdFat SD;
 File logFile;
 #define FILENAME "abreuvoir.csv"
-#define HEADER "Date;ID;Qty"
+#define HEADER "Date;ID;VolumeIn(mL);VolumeOut(mL);Duration(s)"
 //File presenceTest;
 //boolean SD_presence = false;
 
 
 
-bool logLine(const String& line){
+bool logLine(const String& line, bool newline){
   logFile = SD.open(FILENAME, FILE_WRITE);
-  //Serial.print("Saving");
-  //Serial.println(line);
+  Serial.print(F("Saving"));
+  Serial.println(line);
   if (logFile) {                     // if the file is available, write to it:
-    logFile.println(line);
+    if(newline) {
+      logFile.println(line);
+    } else {
+      logFile.print(line);
+    }
+    
     logFile.close();  
     return true;
   } else {
-    //SD.errorPrint();
+    SD.errorPrint();
     //Serial.println(F("Fichier inaccessible"));
     return false;
   }
@@ -35,7 +40,7 @@ bool setupSD(){
   }else {
     //Serial.println(F("SD OK"));
     if(!SD.exists(FILENAME)){
-      logLine(HEADER); 
+      logLine(HEADER, true); 
     }
     return true;
   }

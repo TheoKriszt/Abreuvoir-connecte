@@ -36,6 +36,7 @@ void setupPresenceSensor() {
 
 float distanceMm() {
 
+
 #ifdef USE_TOF
   float range = sensor.readRangeSingleMillimeters();
   if (sensor.timeoutOccurred()) {
@@ -54,12 +55,14 @@ float distanceMm() {
 }
 
 bool presenceDetected() {
-  uint8_t tries = 10;
-  while (tries--) {
-    if (distanceMm() / 10 > PRESENCE_THRESHOLD) {
-      return false;
-    }
-    delay(100);
-  }
-  return true;
+  return false;
+  
+//  uint8_t tries = 10;
+//  while (tries--) {
+//    if (distanceMm() / 10 > PRESENCE_THRESHOLD) {
+//      return false;
+//    }
+//    delay(100);
+//  }
+//  return true;
 }

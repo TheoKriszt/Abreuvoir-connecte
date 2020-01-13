@@ -4,7 +4,7 @@
   void setupFlow();
   int getPulse(uint8_t port);
   void resetFlow();
-  void stopFlow();
+  void stopMonitoring();
   int getPulseCountIn();
   float getVolumeIn();
   float getVolumeOut();
